@@ -1,0 +1,145 @@
+/* Algemene stijlen */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    color: #333;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Container voor inlog- en admin-schermen */
+.container {
+    width: 350px;
+    margin: auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-top: 50px;
+}
+
+/* Formulieren */
+input, button {
+    display: block;
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 10px 15px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Foutmeldingen */
+#errorMessage {
+    color: red;
+    font-weight: bold;
+}
+
+/* Tabellen */
+table {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+td {
+    background-color: #fff;
+}
+
+/* Knoppen */
+.button {
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.approve {
+    background-color: #28a745;
+    color: white;
+}
+
+.pay {
+    background-color: #007bff;
+    color: white;
+}
+
+.admin {
+    background-color: #ff9800;
+    color: white;
+}
+
+.nav {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Hover-effecten voor knoppen */
+.button:hover {
+    opacity: 0.85;
+}
+
+/* Paginanavigatie */
+.page-navigation {
+    margin-top: 20px;
+}
+
+.page-navigation span {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Responsiviteit voor kleinere schermen */
+@media (max-width: 600px) {
+    table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .container {
+        width: 90%;
+        padding: 15px;
+    }
+
+    input, button {
+        width: 100%;
+    }
+}

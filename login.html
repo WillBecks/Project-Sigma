@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inloggen</title>
+    <link rel="stylesheet" href="/style.css">
+    <script defer src="/script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Inloggen</h2>
+        <form id="loginForm">
+            <input type="text" id="loginUsername" placeholder="Gebruikersnaam" required>
+            <input type="password" id="loginPassword" placeholder="Wachtwoord" required>
+            <button type="submit">Log in</button>
+        </form>
+        <p id="errorMessage"></p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("loginForm");
+
+            if (loginForm) {
+                loginForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    // Redirect to startscherm automatically after clicking submit
+                    window.location.href = "/startscherm.html";
+                });
+            }
+        });
+    </script>
+</body>
+</html>

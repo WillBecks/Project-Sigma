@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registreren</title>
+    <link rel="stylesheet" href="/Style.css">
+    <script defer src="/script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Registreren</h2>
+        <form id="registerForm">
+            <input type="text" id="username" placeholder="Gebruikersnaam" required>
+            <input type="password" id="password" placeholder="Wachtwoord" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="text" id="address" placeholder="Adres" required>
+            <input type="text" id="streetname" placeholder="Straatnaam" required>
+            <input type="text" id="housenumber" placeholder="Huisnummer" required>
+            <input type="text" id="zipcode" placeholder="Postcode" required>
+            <input type="text" id="city" placeholder="Stad" required>
+            
+            <label>Fietsgewoontes in km:</label>
+            <input type="number" id="km_monday" placeholder="Kilometers (maandag)" required min="0">
+            <input type="number" id="km_tuesday" placeholder="Kilometers (dinsdag)" required min="0">
+            <input type="number" id="km_wednesday" placeholder="Kilometers (woensdag)" required min="0">
+            <input type="number" id="km_thursday" placeholder="Kilometers (donderdag)" required min="0">
+            <input type="number" id="km_friday" placeholder="Kilometers (vrijdag)" required min="0">
+            
+            <button type="submit">Registreer</button>
+        </form>
+        <p id="errorMessage" style="color: red;"></p>
+    </div>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Check if any of the km inputs are negative (extra validation)
+            let valid = true;
+            const errorMessage = document.getElementById("errorMessage");
+            const kmInputs = [
+                document.getElementById("km_monday"),
+                document.getElementById("km_tuesday"),
+                document.getElementById("km_wednesday"),
+                document.getElementById("km_thursday"),
+                document.getElementById("km_friday")
+            ];
+
+            kmInputs.forEach(input => {
+                if (parseInt(input.value) < 0) {
+                    valid = false;
+                }
+            });
+
+            if (!valid) {
+                errorMessage.textContent = "Kilometers mogen niet negatief zijn.";
+                return;  // Stop form submission if validation fails
+            }
+
+            // Redirect if everything is valid
+            window.location.href = "/startscherm.html";
+        });
+    </script>
+</body>
+</html>

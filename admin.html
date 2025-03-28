@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fietsvergoeding Administratie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .approve { background-color: green; color: white; }
+        .pay { background-color: blue; color: white; }
+        .admin { background-color: orange; color: white; }
+        .nav { background-color: gray; color: white; }
+    </style>
+</head>
+<body>
+    <h2>Fietsvergoeding Administratie</h2>
+    <button class="button nav" onclick="goHome()">Home</button>
+   
+    <table>
+        <tr>
+            <th>Gebruiker</th>
+            <th>Afstand (km)</th>
+            <th>Vergoeding (€)</th>
+            <th>Datum</th>
+            <th>Acties</th>
+        </tr>
+        <tr>
+            <td>Jan Jansen</td>
+            <td>15</td>
+            <td>30</td>
+            <td>2024-03-15</td>
+            <td>
+                <button class="button approve">Goedkeuren</button>
+                <button class="button pay">Betalen</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Piet Pieters</td>
+            <td>20</td>
+            <td>40</td>
+            <td>2024-03-20</td>
+            <td>
+                <button class="button approve">Goedkeuren</button>
+                <button class="button pay">Betalen</button>
+            </td>
+        </tr>
+    </table>
+   
+    <button class="button admin">Maak Admin</button>
+    <br><br>
+    <button class="button nav" onclick="prevPage()">Vorige Pagina</button>
+    <span>Pagina <span id="pageNumber">1</span></span>
+    <button class="button nav" onclick="nextPage()">Volgende Pagina</button>
+   
+    <script>
+        let page = 1;
+        function goHome() {
+            window.location.href = 'startscherm.html';
+        }
+        function prevPage() {
+            if (page > 1) {
+                page--;
+                document.getElementById("pageNumber").innerText = page;
+            }
+        }
+        function nextPage() {
+            page++;
+            document.getElementById("pageNumber").innerText = page;
+        }
+    </script>
+</body>
+</html>
