@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoerscherm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            margin: auto;
+        }
+        .calendar th, .calendar td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 10px;
+            min-width: 60px;
+            background: #fff;
+        }
+        .save-button {
+            background-color: rgb(0, 255, 21);
+            color: white;
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            width: 96%;
+        }
+        .save-button:hover {
+            background-color: rgb(0, 139, 0);
+            width: 96%;
+        }
+        .kilometer-input {
+            width: 50px;
+            text-align: center;
+        }
+        .nav-button {
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
+    <script>
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+
+        function updateCalendar() {
+            const monthNames = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"];
+            document.getElementById("month-name").innerText = monthNames[currentMonth] + " " + currentYear;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+           
+            let calendarHTML = `<tr>
+                <th>Ma</th><th>Di</th><th>Wo</th><th>Do</th><th>Vr</th>
+            </tr>`;
+
+            let date = 1;
+            let rowStarted = false;
+           
+            for (let i = 0; i < 6; i++) {
+                let rowHTML = "<tr>";
+                for (let j = 0; j < 7; j++) {
+                    let isWeekend = (j === 5 || j === 6);
+                    if ((i === 0 && j < (firstDay === 0 ? 6 : firstDay - 1)) || date > lastDate) {
+                        if (!isWeekend) rowHTML += "<td></td>";
+                    } else {
+                        if (!isWeekend) {
+                            rowHTML += `
+                                <td data-date="${date}">
+                                    ${date}<br>
+                                    <input type="checkbox"><br>
+                                    <input type="number" class="kilometer-input" min="0" placeholder="km">
+                                </td>`;
+                            rowStarted = true;
+                        }
+                        date++;
+                    }
+                }
+                rowHTML += "</tr>";
+                if (rowStarted) calendarHTML += rowHTML;
+                if (date > lastDate) break;
+            }
+            document.getElementById("calendar-body").innerHTML = calendarHTML;
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar();
+        }
+
+        function saveSelections() {
+            let checkboxes = document.querySelectorAll(".calendar input[type='checkbox']");
+            let selectedData = [];
+            let totalKilometers = 0;
+            checkboxes.forEach((checkbox) => {
+                if (checkbox.checked) {
+                    let dateCell = checkbox.parentElement;
+                    let kilometerInput = dateCell.querySelector(".kilometer-input");
+                    let kilometers = kilometerInput ? parseInt(kilometerInput.value) || 0 : 0;
+                    totalKilometers += kilometers;
+                    selectedData.push(`${dateCell.dataset.date} ${document.getElementById("month-name").innerText}: ${kilometers} km`);
+                }
+            });
+            alert("Geselecteerde data:\n" + selectedData.join("\n") + "\n\nTotaal gereden kilometers: " + totalKilometers + " km");
+        }
+
+        document.addEventListener("DOMContentLoaded", updateCalendar);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="nav-button" onclick="changeMonth(-1)">&#8592;</span>
+            <strong id="month-name"></strong>
+            <span class="nav-button" onclick="changeMonth(1)">&#8594;</span>
+        </div>
+        <table class="calendar">
+            <tbody id="calendar-body"></tbody>
+        </table>
+        <div class="save-button" onclick="saveSelections()">Opslaan</div>
+    </div>
+</body>
+</html>

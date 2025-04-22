@@ -143,3 +143,48 @@ td {
         width: 100%;
     }
 }
+
+/* Stijlen voor de kalenderweergave */
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    margin: auto;
+}
+
+.calendar th, .calendar td {
+    border: 1px solid black;
+    text-align: center;
+    padding: 10px;
+    min-width: 60px;
+    background: #fff;
+}
+
+/* Opslaan knop */
+.save-button {
+    background-color: rgb(0, 255, 21);
+    color: white;
+    padding: 10px;
+    margin: 10px auto; /* Zorgt ervoor dat de knop gecentreerd is */
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    width: 60%; /* Pas de breedte aan, bijvoorbeeld 60% */
+    display: block; /* Zorgt ervoor dat de marges correct worden toegepast */
+    text-align: center;
+}
+
+.save-button:hover {
+    background-color: rgb(0, 139, 0);
+}
+
+/* Kilometer invoerveld */
+.kilometer-input {
+    width: 50px;
+    text-align: center;
+}
+
+/* Navigatieknoppen */
+.nav-button {
+    cursor: pointer;
+    font-size: 20px;
+}

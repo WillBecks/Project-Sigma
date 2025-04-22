@@ -65,3 +65,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+function saveSelections() {
+    let checkboxes = document.querySelectorAll(".calendar input[type='checkbox']");
+    let selectedDates = [];
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            selectedDates.push(checkbox.parentElement.textContent.trim());
+        }
+    });
+    
+    alert("Geselecteerde data: " + (selectedDates.length > 0 ? selectedDates.join(", ") : "Geen"));
+}
