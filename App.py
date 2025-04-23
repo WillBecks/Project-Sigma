@@ -1,125 +1,122 @@
-from flask import Flask, render_template, request, redirect, session, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
-import os
+from mysql.connector import Error
+from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
-app.secret_key = "geheime_sleutel"
+class DatabaseManager:
+    def __init__(self, host, user, password, database):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
 
-# MySQL database configuration
-MYSQL_HOST = 'localhost'  # change this to your MySQL host
-MYSQL_USER = 'root'       # change this to your MySQL user
-MYSQL_PASSWORD = ''       # change this to your MySQL password
-MYSQL_DATABASE = 'your_database_name'  # change this to your MySQL database name
+    def connect(self):
+        try:
+            connection = mysql.connector.connect(
+                host=self.host,
+                user=self.user,
+                password=self.password,
+                database=self.database
+            )
+            return connection
+        except Error as e:
+            print(f"Error connecting to MySQL: {e}")
+            return None
 
-USE_DATABASE = True  # Set to True to use MySQL, or False to use in-memory temp_users
+    def execute_query(self, query, params=None, fetch_one=False, fetch_all=False):
+        connection = self.connect()
+        if not connection:
+            return None
+        cursor = connection.cursor(dictionary=True)
+        result = None
+        try:
+            cursor.execute(query, params)
+            if fetch_one:
+                result = cursor.fetchone()
+            elif fetch_all:
+                result = cursor.fetchall()
+            else:
+                connection.commit()
+        except Error as e:
+            print(f"Database query error: {e}")
+        finally:
+            cursor.close()
+            connection.close()
+        return result
 
-# In-memory temporary user storage (for testing)
-temp_users = {}
+class UserManager:
+    def __init__(self, db_manager: DatabaseManager):
+        self.db_manager = db_manager
 
-# Function to get MySQL connection
-def get_db_connection():
-    conn = mysql.connector.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DATABASE
+    def register_user(self, username, password, email):
+        hashed_password = generate_password_hash(password)
+        query = "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)"
+        params = (username, hashed_password, email)
+        self.db_manager.execute_query(query, params)
+
+    def authenticate_user(self, username, password):
+        query = "SELECT * FROM users WHERE username = %s"
+        user = self.db_manager.execute_query(query, (username,), fetch_one=True)
+        if user and check_password_hash(user['password'], password):
+            return user
+        return None
+
+# Flask App Factory
+
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = 'your_secret_key_here'  # Vervang dit door een veilige sleutel
+
+    db_manager = DatabaseManager(
+        host='localhost',
+        user='your_user',
+        password='your_password',
+        database='your_database'
     )
-    return conn
+    user_manager = UserManager(db_manager)
 
-# Initialize the database (create the table if it doesn't exist)
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            address TEXT NOT NULL,
-            bike_km_per_day INT DEFAULT 0,
-            is_admin INT DEFAULT 0
-        )
-    ''')
-    conn.commit()
-    conn.close()
 
-if USE_DATABASE:
-    init_db()
-
-@app.route("/")
-def home():
-    return render_template("Index.html")
-
-@app.route("/register.html", methods=["GET", "POST"])
-def register_page():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        email = request.form["email"]
-        address = request.form["address"]
-
-        if USE_DATABASE:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            if cursor.fetchone():
-                return "Gebruiker bestaat al."
-            hashed_password = generate_password_hash(password)
-            cursor.execute("INSERT INTO users (username, password, email, address) VALUES (%s, %s, %s, %s)",
-                           (username, hashed_password, email, address))
-            conn.commit()
-            conn.close()
-        else:
-            if username in temp_users:
-                return "Gebruiker bestaat al."
-            hashed_password = generate_password_hash(password)
-            temp_users[username] = {
-                "password": hashed_password,
-                "email": email,
-                "address": address,
-                "bike_km_per_day": 0,
-                "is_admin": False
-            }
-
-        return redirect(url_for("login_page"))
-
-    return render_template("Register.html")
-
-@app.route("/login.html", methods=["GET", "POST"])
-def login_page():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        if USE_DATABASE:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            user = cursor.fetchone()
-            conn.close()
-            if user and check_password_hash(user["password"], password):
-                session["username"] = user["username"]
-                session["is_admin"] = bool(user["is_admin"])
-                return redirect(url_for("home"))
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            user = user_manager.authenticate_user(username, password)
+            if user:
+                session['user_id'] = user['id']
+                session['username'] = user['username']
+                flash('Login successful!', 'success')
+                return redirect(url_for('index'))
             else:
-                return "Onjuiste gebruikersnaam of wachtwoord."
-        else:
-            user = temp_users.get(username)
-            if user and check_password_hash(user["password"], password):
-                session["username"] = username
-                session["is_admin"] = user["is_admin"]
-                return redirect(url_for("home"))
-            else:
-                return "Onjuiste gebruikersnaam of wachtwoord."
+                flash('Invalid credentials', 'danger')
+        return render_template('login.html')
 
-    return render_template("login.html")
+    @app.route('/register', methods=['GET', 'POST'])
+    def register():
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            email = request.form['email']
+            try:
+                user_manager.register_user(username, password, email)
+                flash('Registration successful! You can now log in.', 'success')
+                return redirect(url_for('login'))
+            except Exception as e:
+                flash(f'Registration failed: {str(e)}', 'danger')
+        return render_template('register.html')
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login_page"))
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        flash('Logged out successfully.', 'info')
+        return redirect(url_for('login'))
+
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True)
+
 
 @app.route("/admin.html")
 def admin_page():

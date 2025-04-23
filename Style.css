@@ -27,7 +27,7 @@ h2 {
 /* Formulieren */
 input, button {
     display: block;
-    width: 90%;
+    width: 93%;
     margin: 10px auto;
     padding: 10px;
     border-radius: 5px;
@@ -147,13 +147,13 @@ td {
 .fiets-row {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 15px;
     flex-wrap: nowrap; /* Voorkom dat ze afbreken naar een nieuwe regel */
 }
 
 .fiets-row input {
-    width: 18%; /* Zorgt dat ze allemaal naast elkaar passen */
+    width: 19%; /* Zorgt dat ze allemaal naast elkaar passen */
     text-align: center;
     padding: 10px;
     font-weight: bold;

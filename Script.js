@@ -78,3 +78,5 @@ function saveSelections() {
     
     alert("Geselecteerde data: " + (selectedDates.length > 0 ? selectedDates.join(", ") : "Geen"));
 }
+
+
