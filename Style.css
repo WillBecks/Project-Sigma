@@ -144,47 +144,207 @@ td {
     }
 }
 
-/* Stijlen voor de kalenderweergave */
-.calendar {
+.fiets-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: nowrap; /* Voorkom dat ze afbreken naar een nieuwe regel */
+}
+
+.fiets-row input {
+    width: 18%; /* Zorgt dat ze allemaal naast elkaar passen */
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.register-btn {
+    width: 200px; /* Maak de knop minder breed */
+    background-color: #90EE90; /* Lichte groene kleur */
+    border: 1px solid #28a745; /* Groene randkleur */
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 1); /* Tekstschaduw */
+}
+
+.register-btn:hover {
+    background-color: #77d977; /* Donkerder groen bij hover */
+}
+
+
+/* Stijl voor admin pagina container */
+.admin-container {
+    width: 500px;
+    margin: 40px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.admin-container h3 {
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.admin-container input {
+    width: 90%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.admin-container .button {
+    width: 95%;
+    margin: 10px 0;
+}
+
+/* Algemene layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+h2 {
+    text-align: center;
+    margin-top: 30px;
+    color: #2c3e50;
+}
+
+.admin-container {
+    max-width: 700px;
+    background-color: #ffffff;
+    margin: 40px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    margin-top: 20px;
+    color: #34495e;
+}
+
+/* Invoer en knoppen */
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.button.nav {
+    background-color: #6c757d;
+    color: white;
+}
+
+.button.admin {
+    background-color: #f39c12;
+    color: white;
+}
+
+.button.save {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.page-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.page-navigation span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Tabellen */
+table {
     width: 100%;
     border-collapse: collapse;
-    margin: auto;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.calendar th, .calendar td {
-    border: 1px solid black;
-    text-align: center;
-    padding: 10px;
-    min-width: 60px;
-    background: #fff;
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
 }
 
-/* Opslaan knop */
-.save-button {
-    background-color: rgb(0, 255, 21);
+th {
+    background-color: #f9f9f9;
+    font-weight: 600;
+    color: #555;
+}
+
+.approve {
+    background-color: #27ae60;
     color: white;
-    padding: 10px;
-    margin: 10px auto; /* Zorgt ervoor dat de knop gecentreerd is */
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-    width: 60%; /* Pas de breedte aan, bijvoorbeeld 60% */
-    display: block; /* Zorgt ervoor dat de marges correct worden toegepast */
-    text-align: center;
 }
 
-.save-button:hover {
-    background-color: rgb(0, 139, 0);
+.pay {
+    background-color: #3498db;
+    color: white;
 }
 
-/* Kilometer invoerveld */
-.kilometer-input {
-    width: 50px;
-    text-align: center;
+/* Responsief */
+@media (max-width: 600px) {
+    .admin-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .button {
+        font-size: 14px;
+    }
+
+    input {
+        font-size: 14px;
+    }
 }
 
-/* Navigatieknoppen */
-.nav-button {
-    cursor: pointer;
-    font-size: 20px;
+.button.back {
+    background-color: #ccc;
+    color: #333;
+    padding: 6px 12px;
+    font-size: 14px;
+    width: auto;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.button.back:hover {
+    background-color: #bbb;
 }

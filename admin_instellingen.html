@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Instellingen</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+    <h2>Admin Instellingen</h2>
+    <button class="button back" onclick="goBack()">← Terug</button>
+
+    <div class="admin-container">
+        <h3>Beheer Administrators</h3>
+        <input type="text" id="adminUser" placeholder="Gebruikersnaam">
+        <button class="button admin" onclick="makeAdmin()">Maak Admin</button>
+
+        <h3>Prijs per Kilometer</h3>
+        <input type="number" id="pricePerKm" step="0.01" placeholder="Prijs per km">
+        <button class="button save" onclick="savePrice()">Opslaan</button>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = 'admin.html';
+        }
+
+        function makeAdmin() {
+            let user = document.getElementById("adminUser").value;
+            if (user) {
+                alert(user + " is nu admin!");
+            } else {
+                alert("Voer een gebruikersnaam in!");
+            }
+        }
+
+        function savePrice() {
+            let price = document.getElementById("pricePerKm").value;
+            if (price) {
+                localStorage.setItem("pricePerKm", price);
+                alert("Prijs per km is bijgewerkt naar " + price + " euro");
+            } else {
+                alert("Voer een geldige prijs in!");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            let savedPrice = localStorage.getItem("pricePerKm");
+            if (savedPrice) {
+                document.getElementById("pricePerKm").value = savedPrice;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -14,11 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 housenumber: document.getElementById("housenumber").value,
                 zipcode: document.getElementById("zipcode").value,
                 city: document.getElementById("city").value,
-                km_monday: document.getElementById("km_monday").value,
-                km_tuesday: document.getElementById("km_tuesday").value,
-                km_wednesday: document.getElementById("km_wednesday").value,
-                km_thursday: document.getElementById("km_thursday").value,
-                km_friday: document.getElementById("km_friday").value
+                km_monday: document.getElementById("km_monday").value || "0",
+                km_tuesday: document.getElementById("km_tuesday").value || "0",
+                km_wednesday: document.getElementById("km_wednesday").value || "0",
+                km_thursday: document.getElementById("km_thursday").value || "0",
+                km_friday: document.getElementById("km_friday").value || "0"
             };
 
             fetch("/register", {

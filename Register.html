@@ -20,12 +20,14 @@
             <input type="text" id="zipcode" placeholder="Postcode" required>
             <input type="text" id="city" placeholder="Stad" required>
             
-            <label>Fietsgewoontes in km:</label>
-            <input type="number" id="km_monday" placeholder="Kilometers (maandag)" required min="0">
-            <input type="number" id="km_tuesday" placeholder="Kilometers (dinsdag)" required min="0">
-            <input type="number" id="km_wednesday" placeholder="Kilometers (woensdag)" required min="0">
-            <input type="number" id="km_thursday" placeholder="Kilometers (donderdag)" required min="0">
-            <input type="number" id="km_friday" placeholder="Kilometers (vrijdag)" required min="0">
+            <label for="fietsgewoontes">Fietsgewoontes in km:</label>
+            <div class="fiets-row">
+                <input type="number" id="km_monday" placeholder="Ma" required min="0">
+                <input type="number" id="km_tuesday" placeholder="Di" required min="0">
+                <input type="number" id="km_wednesday" placeholder="Wo" required min="0">
+                <input type="number" id="km_thursday" placeholder="Do" required min="0">
+                <input type="number" id="km_friday" placeholder="Vr" required min="0">
+            </div>
             
             <button type="submit">Registreer</button>
         </form>
