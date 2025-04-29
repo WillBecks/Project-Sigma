@@ -1,134 +1,150 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
 from mysql.connector import Error
-from werkzeug.security import generate_password_hash, check_password_hash
 
-class DatabaseManager:
-    def __init__(self, host, user, password, database):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
-
-    def connect(self):
+class Database:
+    def __init__(self, host, database, user, password, port=3306):
         try:
-            connection = mysql.connector.connect(
-                host=self.host,
-                user=self.user,
-                password=self.password,
-                database=self.database
+            self.connection = mysql.connector.connect(
+                host=host,
+                database=database,
+                user=user,
+                password=password,
+                port=port  # Specify the port separately
             )
-            return connection
+            if self.connection.is_connected():
+                print("Connected to MySQL database")
         except Error as e:
-            print(f"Error connecting to MySQL: {e}")
-            return None
+            print(f"Error while connecting to MySQL: {e}")
+            self.connection = None
 
-    def execute_query(self, query, params=None, fetch_one=False, fetch_all=False):
-        connection = self.connect()
-        if not connection:
-            return None
-        cursor = connection.cursor(dictionary=True)
-        result = None
+    def close(self):
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+            print("MySQL connection is closed")
+
+
+class GebruikerDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_gebruiker(self, naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente):
+        cursor = None  # Initialize cursor here to ensure proper handling of errors
         try:
-            cursor.execute(query, params)
-            if fetch_one:
-                result = cursor.fetchone()
-            elif fetch_all:
-                result = cursor.fetchall()
-            else:
-                connection.commit()
+            if not self.db.connection:  # If connection is None, return early
+                print("No database connection")
+                return
+
+            cursor = self.db.connection.cursor()
+            query = """
+                INSERT INTO gebruiker (naam, familienaam, `e-mail`, wachtwoord, straat, postcode, straatnr, gemeente)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(query, (naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente))
+            self.db.connection.commit()
+            print("Gebruiker toegevoegd.")
         except Error as e:
-            print(f"Database query error: {e}")
+            print(f"Fout bij toevoegen gebruiker: {e}")
         finally:
-            cursor.close()
-            connection.close()
-        return result
+            if cursor:
+                cursor.close()  # Close cursor only if it was created
 
-class UserManager:
-    def __init__(self, db_manager: DatabaseManager):
-        self.db_manager = db_manager
+    def get_all_gebruikers(self):
+        cursor = None
+        try:
+            if not self.db.connection:
+                print("No database connection")
+                return []
 
-    def register_user(self, username, password, email):
-        hashed_password = generate_password_hash(password)
-        query = "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)"
-        params = (username, hashed_password, email)
-        self.db_manager.execute_query(query, params)
+            cursor = self.db.connection.cursor(dictionary=True)
+            query = "SELECT * FROM gebruiker"
+            cursor.execute(query)
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Fout bij ophalen gebruikers: {e}")
+            return []
+        finally:
+            if cursor:
+                cursor.close()
 
-    def authenticate_user(self, username, password):
-        query = "SELECT * FROM users WHERE username = %s"
-        user = self.db_manager.execute_query(query, (username,), fetch_one=True)
-        if user and check_password_hash(user['password'], password):
-            return user
-        return None
+    def get_gebruiker_by_id(self, idgebruiker):
+        cursor = None
+        try:
+            if not self.db.connection:
+                print("No database connection")
+                return None
 
-# Flask App Factory
+            cursor = self.db.connection.cursor(dictionary=True)
+            query = "SELECT * FROM gebruiker WHERE idgebruiker = %s"
+            cursor.execute(query, (idgebruiker,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"Fout bij ophalen gebruiker: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
 
-def create_app():
-    app = Flask(__name__)
-    app.secret_key = 'your_secret_key_here'  # Vervang dit door een veilige sleutel
+    def update_gebruiker(self, idgebruiker, naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente):
+        cursor = None
+        try:
+            if not self.db.connection:
+                print("No database connection")
+                return
 
-    db_manager = DatabaseManager(
-        host='localhost',
-        user='your_user',
-        password='your_password',
-        database='your_database'
-    )
-    user_manager = UserManager(db_manager)
+            cursor = self.db.connection.cursor()
+            query = """
+                UPDATE gebruiker
+                SET naam=%s, familienaam=%s, `e-mail`=%s, wachtwoord=%s, straat=%s, postcode=%s, straatnr=%s, gemeente=%s
+                WHERE idgebruiker=%s
+            """
+            cursor.execute(query, (naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente, idgebruiker))
+            self.db.connection.commit()
+            print("Gebruiker bijgewerkt.")
+        except Error as e:
+            print(f"Fout bij bijwerken gebruiker: {e}")
+        finally:
+            if cursor:
+                cursor.close()
 
+    def delete_gebruiker(self, idgebruiker):
+        cursor = None
+        try:
+            if not self.db.connection:
+                print("No database connection")
+                return
 
-    @app.route('/login', methods=['GET', 'POST'])
-    def login():
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            user = user_manager.authenticate_user(username, password)
-            if user:
-                session['user_id'] = user['id']
-                session['username'] = user['username']
-                flash('Login successful!', 'success')
-                return redirect(url_for('index'))
-            else:
-                flash('Invalid credentials', 'danger')
-        return render_template('login.html')
-
-    @app.route('/register', methods=['GET', 'POST'])
-    def register():
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            email = request.form['email']
-            try:
-                user_manager.register_user(username, password, email)
-                flash('Registration successful! You can now log in.', 'success')
-                return redirect(url_for('login'))
-            except Exception as e:
-                flash(f'Registration failed: {str(e)}', 'danger')
-        return render_template('register.html')
-
-    @app.route('/logout')
-    def logout():
-        session.clear()
-        flash('Logged out successfully.', 'info')
-        return redirect(url_for('login'))
-
-    return app
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+            cursor = self.db.connection.cursor()
+            query = "DELETE FROM gebruiker WHERE idgebruiker = %s"
+            cursor.execute(query, (idgebruiker,))
+            self.db.connection.commit()
+            print("Gebruiker verwijderd.")
+        except Error as e:
+            print(f"Fout bij verwijderen gebruiker: {e}")
+        finally:
+            if cursor:
+                cursor.close()
 
 
-@app.route("/admin.html")
-def admin_page():
-    if not session.get("is_admin"):
-        return "Toegang geweigerd."
-    return render_template("admin.html")
-
-@app.route("/admin_instellingen.html")
-def admin_page():
-    if not session.get("is_admin"):
-        return "Toegang geweigerd."
-    return render_template("admin_instellingen.html")
-
+# Voorbeeld gebruik:
 if __name__ == "__main__":
-    app.run(debug=True)
+    db = Database(host="127.0.0.1", database="mydb", user="root", password="Willem2007")
+
+    gebruiker_dao = GebruikerDAO(db)
+
+    # Voeg een gebruiker toe (voorbeeld)
+    gebruiker_dao.create_gebruiker(
+        naam="Mauro",
+        familienaam="Vilroxk",
+        email="maurovilroxk@telenet.be",
+        wachtwoord="De hond 007",
+        straat="Hondenwijk",
+        postcode="3900",
+        straatnr="34",
+        gemeente="Pelt"
+    )
+
+    # Haal alle gebruikers op
+    gebruikers = gebruiker_dao.get_all_gebruikers()
+    print(gebruikers)
+
+    db.close()
