@@ -1,0 +1,235 @@
+import mysql.connector
+from mysql.connector import Error
+
+class Database:
+    def __init__(self, host, database, user, password):
+        try:
+            self.connection = mysql.connector.connect(
+                host=host,
+                database=database,
+                user=user,
+                password=password
+            )
+            if self.connection.is_connected():
+                print("Connected to MySQL database")
+        except Error as e:
+            print(f"Error while connecting to MySQL: {e}")
+            self.connection = None
+
+    def close(self):
+        if self.connection.is_connected():
+            self.connection.close()
+            print("MySQL connection is closed")
+
+
+class GebruikerDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_gebruiker(self, naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente):
+        try:
+            cursor = self.db.connection.cursor()
+            query = """
+                INSERT INTO gebruiker (naam, familienaam, `e-mail`, wachtwoord, straat, postcode, straatnr, gemeente)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(query, (naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente))
+            self.db.connection.commit()
+            print("Gebruiker toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen gebruiker: {e}")
+        finally:
+            cursor.close()
+
+    def get_all_gebruikers(self):
+        try:
+            cursor = self.db.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM gebruiker")
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Fout bij ophalen gebruikers: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def get_gebruiker_by_id(self, idgebruiker):
+        try:
+            cursor = self.db.connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM gebruiker WHERE idgebruiker = %s", (idgebruiker,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"Fout bij ophalen gebruiker: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def update_gebruiker(self, idgebruiker, naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente):
+        try:
+            cursor = self.db.connection.cursor()
+            query = """
+                UPDATE gebruiker
+                SET naam=%s, familienaam=%s, `e-mail`=%s, wachtwoord=%s, straat=%s, postcode=%s, straatnr=%s, gemeente=%s
+                WHERE idgebruiker=%s
+            """
+            cursor.execute(query, (naam, familienaam, email, wachtwoord, straat, postcode, straatnr, gemeente, idgebruiker))
+            self.db.connection.commit()
+            print("Gebruiker bijgewerkt.")
+        except Error as e:
+            print(f"Fout bij bijwerken gebruiker: {e}")
+        finally:
+            cursor.close()
+
+    def delete_gebruiker(self, idgebruiker):
+        try:
+            cursor = self.db.connection.cursor()
+            cursor.execute("DELETE FROM gebruiker WHERE idgebruiker = %s", (idgebruiker,))
+            self.db.connection.commit()
+            print("Gebruiker verwijderd.")
+        except Error as e:
+            print(f"Fout bij verwijderen gebruiker: {e}")
+        finally:
+            cursor.close()
+
+
+class BetalingDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_betaling(self, status, bedrag, idgebruiker):
+        try:
+            cursor = self.db.connection.cursor()
+            query = "INSERT INTO betaling (status, bedrag, idgebruiker) VALUES (%s, %s, %s)"
+            cursor.execute(query, (status, bedrag, idgebruiker))
+            self.db.connection.commit()
+            print("Betaling toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen betaling: {e}")
+        finally:
+            cursor.close()
+
+
+class DagenDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_dag(self, afstand, datum, idfietsvergoeding):
+        try:
+            cursor = self.db.connection.cursor()
+            query = "INSERT INTO dagen (afstand, datum, idfietsvergoeding) VALUES (%s, %s, %s)"
+            cursor.execute(query, (afstand, datum, idfietsvergoeding))
+            self.db.connection.commit()
+            print("Dag toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen dag: {e}")
+        finally:
+            cursor.close()
+
+
+class LogboekDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_log(self, acties, tijdstip, idgebruiker):
+        try:
+            cursor = self.db.connection.cursor()
+            query = "INSERT INTO logboek (acties, tijdstip, idgebruiker) VALUES (%s, %s, %s)"
+            cursor.execute(query, (acties, tijdstip, idgebruiker))
+            self.db.connection.commit()
+            print("Logboek item toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen logboek: {e}")
+        finally:
+            cursor.close()
+
+
+class FietsvergoedingDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_vergoeding(self, aantal_kilometers, idgebruiker):
+        try:
+            cursor = self.db.connection.cursor()
+            query = "INSERT INTO fietsvergoeding (aantal_kilometers, idgebruiker) VALUES (%s, %s)"
+            cursor.execute(query, (aantal_kilometers, idgebruiker))
+            self.db.connection.commit()
+            print("Fietsvergoeding toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen fietsvergoeding: {e}")
+        finally:
+            cursor.close()
+
+
+class FietsprofielDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_profiel(self, maandag, dinsdag, woensdag, donderdag, vrijdag, km_per_dag, idgebruiker):
+        try:
+            cursor = self.db.connection.cursor()
+            query = """
+                INSERT INTO fietsprofiel (maandag, dinsdag, woensdag, donderdag, vrijdag, kilometer_per_dag, idgebruiker)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(query, (maandag, dinsdag, woensdag, donderdag, vrijdag, km_per_dag, idgebruiker))
+            self.db.connection.commit()
+            print("Fietsprofiel toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen fietsprofiel: {e}")
+        finally:
+            cursor.close()
+
+
+class PrijzenDAO:
+    def __init__(self, db: Database):
+        self.db = db
+
+    def create_prijs(self, prijs, begindatum, einddatum):
+        try:
+            cursor = self.db.connection.cursor()
+            query = "INSERT INTO prijzen (prijs, begindatum, einddatum) VALUES (%s, %s, %s)"
+            cursor.execute(query, (prijs, begindatum, einddatum))
+            self.db.connection.commit()
+            print("Prijs toegevoegd.")
+        except Error as e:
+            print(f"Fout bij toevoegen prijs: {e}")
+        finally:
+            cursor.close()
+
+
+# ==== VOORBEELD GEBRUIK ====
+if __name__ == "__main__":
+    db = Database(host="127.0.0.1", database="mydb", user="root", password="12345")
+
+    # Gebruiker toevoegen
+    gebruiker_dao = GebruikerDAO(db)
+    gebruiker_dao.create_gebruiker("Jan", "Peeters", "jan@example.com", "wachtwoord123", "Hoofdstraat", "1000", "12", "Brussel")
+
+    # Gebruiker ophalen
+    gebruikers = gebruiker_dao.get_all_gebruikers()
+    print(gebruikers)
+
+    # Betaling toevoegen
+    betaling_dao = BetalingDAO(db)
+    betaling_dao.create_betaling("voltooid", "25.00", 1)
+
+    # Fietsvergoeding toevoegen
+    vergoeding_dao = FietsvergoedingDAO(db)
+    vergoeding_dao.create_vergoeding(15, 1)
+
+    # Dag toevoegen
+    dagen_dao = DagenDAO(db)
+    dagen_dao.create_dag(5, "2025-04-30", 1)
+
+    # Logboek item toevoegen
+    logboek_dao = LogboekDAO(db)
+    logboek_dao.create_log("Ingelogd", "2025-04-30 09:00:00", 1)
+
+    # Fietsprofiel toevoegen
+    profiel_dao = FietsprofielDAO(db)
+    profiel_dao.create_profiel("ja", "nee", "ja", "nee", "ja", 10, 1)
+
+    # Prijs toevoegen
+    prijzen_dao = PrijzenDAO(db)
+    prijzen_dao.create_prijs("0.25", "2025-01-01", "2025-12-31")
+
+    db.close()
