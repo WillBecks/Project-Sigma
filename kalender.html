@@ -44,7 +44,7 @@
       background: #fff;
     }
     .save-button {
-      background-color: rgb(0, 255, 21);
+      background-color: #28a745;
       color: white;
       padding: 10px;
       margin-top: 10px;
@@ -63,31 +63,6 @@
     .nav-button {
       cursor: pointer;
       font-size: 20px;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0,0,0,0.4);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 500px;
-      text-align: left;
-    }
-    .close-button {
-      float: right;
-      font-size: 20px;
-      cursor: pointer;
     }
   </style>
   <script>
@@ -193,21 +168,10 @@
         <strong>Totaal gereden kilometers: ${totalKilometers} km</strong>
       `;
 
-      openModal(resultHTML);
+      document.getElementById("resultaat").innerHTML = resultHTML;
     }
 
-    function openModal(content) {
-      document.getElementById("popup-content").innerHTML = content;
-      document.getElementById("popupModal").style.display = "flex";
-    }
-
-    function closeModal() {
-      document.getElementById("popupModal").style.display = "none";
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      updateCalendar();
-    });
+    document.addEventListener("DOMContentLoaded", updateCalendar);
   </script>
 </head>
 <body>
@@ -221,21 +185,14 @@
       <tbody id="calendar-body"></tbody>
     </table>
 
-    <!-- Live totaal kilometers -->
     <div id="totaal-kilometers" style="margin-top: 10px; font-weight: bold;">
       Totaal gereden kilometers: 0 km
     </div>
 
     <div class="save-button" onclick="saveSelections()">Opslaan</div>
-  </div>
 
-  <!-- Modal Popup -->
-  <div id="popupModal" class="modal">
-    <div class="modal-content">
-      <span class="close-button" onclick="closeModal()">&times;</span>
-      <div id="popup-content"></div>
-    </div>
+    <!-- Resultaat direct onder de knop -->
+    <div id="resultaat" style="margin-top: 15px; text-align: left;"></div>
   </div>
 </body>
 </html>
-
